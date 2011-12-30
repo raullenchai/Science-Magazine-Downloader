@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # Written in 2011 by Qi (Raullen) Chai <https://ece.uwaterloo.ca/~q3chai/>
+#
 
 import os
 import sys
@@ -19,15 +20,20 @@ class MyURLopener(urllib.FancyURLopener):
 def pdfcat(fileList, magPath, magTitle):
     myoutput = PdfFileWriter()
     for f in fileList:
-        myinput = PdfFileReader(file(magPath + "\\" + f, "rb"))
+        myinput = PdfFileReader(file(magPath + "/" + f, "rb"))
         # add pages from myinput to output document, unchanged
         for i in range(myinput.getNumPages()):
             myoutput.addPage(myinput.getPage(i))
 
-    # finally, write "output" to document-output.pdf
-    outputStream = file(magPath + "\\" + magTitle+".pdf", "wb")
+    #write "output" to document-output.pdf
+    outputStream = file(magPath + "/" + magTitle+".pdf", "wb")
     myoutput.write(outputStream)
     outputStream.close()
+
+    #finally, delete the single pdfs
+    for f in fileList:
+        os.remove(magPath + "/" + f)
+        
 
 
 # validate arguments and start downloading
@@ -86,7 +92,21 @@ def main(argv):
         magTitle = magTitle.replace(';', '')
         magTitle = magTitle.replace('(', '')
         magTitle = magTitle.replace(')', '')
-    
+        
+        magTitle = magTitle.replace('January', 'Jan')
+        magTitle = magTitle.replace('February', 'Feb')
+        magTitle = magTitle.replace('March', 'Mar')
+        magTitle = magTitle.replace('April', 'Apr')
+        magTitle = magTitle.replace('May', 'May')
+        magTitle = magTitle.replace('June', 'Jun')
+        magTitle = magTitle.replace('July', 'Jul')
+        magTitle = magTitle.replace('August', 'Aug')
+        magTitle = magTitle.replace('September', 'Sep')
+        magTitle = magTitle.replace('October', 'Oct')
+        magTitle = magTitle.replace('November', 'Nov')
+        magTitle = magTitle.replace('December', 'Dec')
+        
+
     # get chapters
     for match in re.finditer(r"/.*\.full\.pdf", page):
         chapterLink = "http://www.sciencemag.org" + match.group(0)
@@ -109,24 +129,22 @@ def main(argv):
             os.chdir(curDir)
             shutil.rmtree(tempDir)
             error("downloaded chapter %s has invalid mime type %s - are you allowed to download %s?" % (chapterLink, mimeType.gettype(), magTitle))
-
         fileList.append(localFile)
         i += 1
 
-
+        
+    for f in fileList:
+        shutil.move(f, curDir)
+    os.chdir(curDir)
+    
     if merge:
         print "merging articles"
         if len(fileList) == 1:
-            shutil.move(fileList[0], curDir)
+            os.rename(fileList[0], magTitle)
         else:
             pdfcat(fileList, curDir, magTitle)
-    else:
-        for f in fileList:
-            shutil.move(f, curDir)
-    
-    
+
     # cleanup
-    os.chdir(curDir)
     shutil.rmtree(tempDir)
 
     print "%s was successfully downloaded, it was saved to %s" % (magTitle, curDir)
