@@ -1,1 +1,15 @@
-https://ece.uwaterloo.ca/~q3chai/
+Usage:
+
+Options:
+  -h, --help              Display this usage message
+  -v, --volume            defines the volume of the science magazine you intend to download
+  -i, --issue             defines the issue of the science magazine you intend to download
+  -n, --no-merge          Only download the articles but don't merge them into a single PDF.
+
+An Example: to download all the articles in "http://www.sciencemag.org/content/334/6062" and merge them into a single pdf file, one may execute:
+
+	python sciencemag.py -v 334 -i 6062
+	
+Note that this program is assumed to run with an IP that is able to access full-text PDFs at sciencemag.org.
+
+Please feel free to use/distibute/fork and contact me if you have any question.
